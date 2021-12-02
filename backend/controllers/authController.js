@@ -7,34 +7,6 @@ const sendEmail = require('../utils/sendEmail')
 const crypto = require('crypto')
 const cloudinary = require('cloudinary')
 
-// Register a user => /api/v1/register
-
-// exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-
-//     const result = await cloudinary.v2.uploader.upload(req.body.avatar, {
-//         folder: 'avatars',
-//         width: 150,
-//         crop: "scale",
-
-//     })
-
-//     const { name, email, password } = req.body
-
-//     const user = await User.create({
-//         name,
-//         email,
-//         password,
-//         avatar: {
-//             public_id:  // 'avatars/kccvibpsuiumxfepb3m.png',
-//                 result.public_id,
-//             url: result.secure_url
-//             // 'https://res.cloudinary.com/shopit/image/upload/v1606305757/avatars/kccvibpsuiusmwfepb3m.png'
-//         }
-//     })
-
-//     sendToken(user, 200, res)
-// })
-
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 
     const result = await cloudinary.v2.uploader.upload(req.body.avatar, {
@@ -292,7 +264,10 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler(`User does not found with id ${req.params.id}`))
     }
 
-    // Remove avtar from cloudinary - TODO
+    // Remove avatar from cloudinary
+    const image_id = user.avatar.public_id;
+    await cloudinary.v2.uploader.destroy(image_id);
+
     await user.remove()
 
     res.status(200).json({
